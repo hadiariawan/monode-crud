@@ -49,11 +49,8 @@ app.configure('development', function(){
 app.get('/', function(req, res){
 
     var listData = function(err, collection) {
-
         collection.find().toArray(function(err, results) {
-            
             res.render('index.html', { layout : false , 'title' : 'Monode-crud', 'results' : results });
-
         });
     }
 
