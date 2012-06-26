@@ -85,7 +85,43 @@ app.post('/save_record', function(req, res){
 });
 
 app.get('/edit_record/:id', function(req, res){
-    res.render('add.html', { layout : false , 'title' : 'Monode-crud'});
+
+    var ObjectID = require('mongodb').ObjectID;
+
+    var listData = function(err, collection) {
+
+        var chosenId = new ObjectID(req.params.id);
+        collection.findOne({'_id' : chosenId} , function(err, results) {
+            console.log(results);
+            res.render('edit.html', { layout : false , 'title' : 'Monode-crud', 'results' : results });
+        });
+    }
+
+    var Client = new Db('monode-crud', new Server('127.0.0.1', 27017, {}));
+    Client.open(function(err, pClient) {
+        Client.collection('users', listData);
+        //Client.close();
+    });
+
+});
+
+app.post('/update_record', function(req, res){
+    console.log(req.body);
+
+    var ObjectID = require('mongodb').ObjectID;
+
+    var data = {'first_name' : req.body.first_name , 'last_name' : req.body.last_name, 'email' : req.body.email };
+    var updateData = function(err, collection) {
+        var chosenId = new ObjectID(req.body.id);
+        collection.update({"_id": chosenId}, {$set: data });
+    }
+    var Client = new Db('monode-crud', new Server('127.0.0.1', 27017, {}));
+    Client.open(function(err, pClient) {
+        Client.collection('users', updateData);
+        Client.close();
+    });    
+
+    res.redirect('/');
 });
 
 app.get('/delete_record/:id', function(req, res){
